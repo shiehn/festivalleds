@@ -55,104 +55,127 @@ void setup() {
 void loop() {
 
   handleButtonClick();
-  
-  if (buttonVal == 0) {
-    // %%%%%%%%%%%%%%%%%%%%%%%% COLOR PATERNS CODE %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+  switch (buttonVal) {
+    case 0 :
+      // %%%%%%%%%%%%%%%%%%%%%%%% COLOR PATERNS CODE %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+      Serial.println("COLOR PATTERNS!!!");
+      colorWipe(strip.Color(255,   0,   0), 50); // Red
+      break;
+    case 1 :
+      colorWipe(strip.Color(  0, 255,   0), 50); // Green
+      break;
+    case 2 :
+      colorWipe(strip.Color(  0,   0, 255), 50); // Blue
+      break;
+    case 3 :
+      theaterChase(strip.Color(127, 127, 127), 50); // White, half brightness
+      break;
+    case 4 :
+      theaterChase(strip.Color(127,   0,   0), 50); // Red, half brightness
+      break;
+    case 5 :
+      theaterChase(strip.Color(  0,   0, 127), 50); // Blue, half brightness
+      break;
+    case 6 :
+      rainbow(10);
+      break;
+    case 7 :
+      theaterChaseRainbow(50);
+      break;
+    case 8 :
+      // %%%%%%%%%%%%%%%%%%%%%%%% VU_METER CODE %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+      Serial.println("VU CODE!!!");
 
-    Serial.println("COLOR PATTERNS!!!");
+      uint8_t  i;
+      uint16_t minLvl, maxLvl;
+      int      n, height;
 
-  } else {
-    // %%%%%%%%%%%%%%%%%%%%%%%% VU_METER CODE %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+      n   = analogRead(MIC_PIN);            // Raw reading from mic
+      n   = abs(n - 512 - DC_OFFSET);       // Center on zero
+      n   = (n <= NOISE) ? 0 : (n - NOISE); // Remove noise/hum
+      lvl = ((lvl * 7) + n) >> 3;           // "Dampened" reading (else looks twitchy)
 
-    Serial.println("VU CODE!!!");
+      // Calculate bar height based on dynamic min/max levels (fixed point):
+      height = TOP * (lvl - minLvlAvg) / (long)(maxLvlAvg - minLvlAvg);
 
-    uint8_t  i;
-    uint16_t minLvl, maxLvl;
-    int      n, height;
-
-    n   = analogRead(MIC_PIN);            // Raw reading from mic
-    n   = abs(n - 512 - DC_OFFSET);       // Center on zero
-    n   = (n <= NOISE) ? 0 : (n - NOISE); // Remove noise/hum
-    lvl = ((lvl * 7) + n) >> 3;           // "Dampened" reading (else looks twitchy)
-
-    // Calculate bar height based on dynamic min/max levels (fixed point):
-    height = TOP * (lvl - minLvlAvg) / (long)(maxLvlAvg - minLvlAvg);
-
-    if (height < 0L) {
-      height = 0;      // Clip output
-    } else if (height > TOP) {
-      height = TOP;
-    }
-
-    if (height > peak) {
-      peak   = height; // Keep 'peak' dot at top
-    }
-
-    // Color pixels based on rainbow gradient
-    for (i = 0; i < N_PIXELS; i++) {
-      if (i >= height)               {
-        strip.setPixelColor(i,   0,   0, 0);
-      } else {
-        strip.setPixelColor(i, Wheel(map(i, 0, strip.numPixels() - 1, 30, 150)));
+      if (height < 0L) {
+        height = 0;      // Clip output
+      } else if (height > TOP) {
+        height = TOP;
       }
-    }
-    // Draw peak dot
-    if (peak > 0 && peak <= N_PIXELS - 1) {
-      strip.setPixelColor(peak, Wheel(map(peak, 0, strip.numPixels() - 1, 30, 150)));
-    }
 
-    strip.show(); // Update strip
-
-    // Every few frames, make the peak pixel drop by 1:
-
-    if (++dotCount >= PEAK_FALL) { //fall rate
-      if (peak > 0) {
-        peak--;
+      if (height > peak) {
+        peak   = height; // Keep 'peak' dot at top
       }
-      dotCount = 0;
-    }
 
-    vol[volCount] = n;                      // Save sample for dynamic leveling
-    if (++volCount >= SAMPLES) {
-      volCount = 0; // Advance/rollover sample counter
-    }
-
-    // Get volume range of prior frames
-    minLvl = maxLvl = vol[0];
-    for (i = 1; i < SAMPLES; i++) {
-      if (vol[i] < minLvl) {
-        minLvl = vol[i];
-      } else if (vol[i] > maxLvl) {
-        maxLvl = vol[i];
+      // Color pixels based on rainbow gradient
+      for (i = 0; i < N_PIXELS; i++) {
+        if (i >= height)               {
+          strip.setPixelColor(i,   0,   0, 0);
+        } else {
+          strip.setPixelColor(i, Wheel(map(i, 0, strip.numPixels() - 1, 30, 150)));
+        }
       }
-    }
-    // minLvl and maxLvl indicate the volume range over prior frames, used
-    // for vertically scaling the output graph (so it looks interesting
-    // regardless of volume level).  If they're too close together though
-    // (e.g. at very low volume levels) the graph becomes super coarse
-    // and 'jumpy'...so keep some minimum distance between them (this
-    // also lets the graph go to zero when no sound is playing):
-    if ((maxLvl - minLvl) < TOP) {
-      maxLvl = minLvl + TOP;
-    }
-    minLvlAvg = (minLvlAvg * 63 + minLvl) >> 6; // Dampen min/max levels
-    maxLvlAvg = (maxLvlAvg * 63 + maxLvl) >> 6; // (fake rolling average)
+      // Draw peak dot
+      if (peak > 0 && peak <= N_PIXELS - 1) {
+        strip.setPixelColor(peak, Wheel(map(peak, 0, strip.numPixels() - 1, 30, 150)));
+      }
+
+      strip.show(); // Update strip
+
+      // Every few frames, make the peak pixel drop by 1:
+
+      if (++dotCount >= PEAK_FALL) { //fall rate
+        if (peak > 0) {
+          peak--;
+        }
+        dotCount = 0;
+      }
+
+      vol[volCount] = n;                      // Save sample for dynamic leveling
+      if (++volCount >= SAMPLES) {
+        volCount = 0; // Advance/rollover sample counter
+      }
+
+      // Get volume range of prior frames
+      minLvl = maxLvl = vol[0];
+      for (i = 1; i < SAMPLES; i++) {
+        if (vol[i] < minLvl) {
+          minLvl = vol[i];
+        } else if (vol[i] > maxLvl) {
+          maxLvl = vol[i];
+        }
+      }
+      // minLvl and maxLvl indicate the volume range over prior frames, used
+      // for vertically scaling the output graph (so it looks interesting
+      // regardless of volume level).  If they're too close together though
+      // (e.g. at very low volume levels) the graph becomes super coarse
+      // and 'jumpy'...so keep some minimum distance between them (this
+      // also lets the graph go to zero when no sound is playing):
+      if ((maxLvl - minLvl) < TOP) {
+        maxLvl = minLvl + TOP;
+      }
+      minLvlAvg = (minLvlAvg * 63 + minLvl) >> 6; // Dampen min/max levels
+      maxLvlAvg = (maxLvlAvg * 63 + maxLvl) >> 6; // (fake rolling average)
+      break;
   }
 }
 
-void handleButtonClick() {
+bool handleButtonClick() {
   if (digitalRead(12) == HIGH) {
     int prevVal = buttonVal;
-        
-    if (buttonVal == 0) {
-      buttonVal = 1;
-    } else {
+
+    buttonVal++;
+    if (buttonVal > 9) { 
       buttonVal = 0;
     }
 
-    if(prevVal != buttonVal){
+    if (prevVal != buttonVal) {
       delay(500);
-    } 
-  }
+      return true;
+    }
+
+    return false;
+  } 
 }
