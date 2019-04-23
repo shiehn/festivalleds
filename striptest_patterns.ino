@@ -16,6 +16,13 @@ void colorWipe(uint32_t color, int wait) {
   }
 }
 
+void quickPaint(uint32_t color) {
+  for (int i = 0; i < strip.numPixels(); i++) {
+    strip.setPixelColor(i, color);          
+  }
+  strip.show(); 
+}
+
 // Theater-marquee-style chasing lights. Pass in a color (32-bit value,
 // a la strip.Color(r,g,b) as mentioned above), and a delay time (in ms)
 // between frames.
