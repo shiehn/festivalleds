@@ -31,7 +31,7 @@ vol[SAMPLES],       // Collection of prior volume samples
 
 
 int currentCase = 999;
-int buttonVal = 0;
+int buttonVal = 2;
     
 Adafruit_NeoPixel strip = Adafruit_NeoPixel(N_PIXELS, LED_PIN, NEO_GRB + NEO_KHZ800);
 
@@ -43,13 +43,20 @@ void setup() {
   //analogReference(EXTERNAL);
   memset(vol, 0, sizeof(vol));
   strip.begin();
-  strip.setBrightness(50);
+  strip.setBrightness(100);
 
-  Serial.begin(9600);
+  Serial.begin(9600); 
 }
 
 int randSpeed=0;
 int randPause=0;
+
+
+
+
+
+
+
  
 void loop() {
 
@@ -77,13 +84,15 @@ void loop() {
       currentCase = 1;
       theaterChase(strip.Color(127, 127, 127), 50); // White, half brightness
       break;
-    case 2 :
+    case 2 : 
       currentCase = 2;
-      theaterChase(strip.Color(127,   0,   0), 50); // Red, half brightness
+      centerBounce();
+      //theaterChase(strip.Color(127,   0,   0), 50); // Red, half brightness
       break;
     case 3 :
       currentCase = 3;
-      theaterChase(strip.Color(  0,   0, 127), 50); // Blue, half brightness
+      Serial.println("COLOR PULSE!!!");
+      colorPulse();
       break;
     case 4 :
       currentCase = 4;
