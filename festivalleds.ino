@@ -67,6 +67,64 @@ void setup() {
 int randSpeed=0;
 int randPause=0;
 
+
+
+
+
+int candyLength = 14;
+int spacing = 3;
+int offset = 0;
+
+int getOffSet(int index, int off_set, int maxlen){
+  int value = index + off_set;
+
+  if(value < maxlen){
+    return value;
+  } else {
+    return value - maxlen;  
+  }
+}
+
+void candy_cane(){
+  int candyCount = 0;
+  for (int i = 0; i < N_PIXELS; i++) {
+
+      //Serial.println(getOffSet(i, offset, N_PIXELS)); 
+    
+    if (candyCount < candyLength) {
+      strip.setPixelColor(getOffSet(i, offset, N_PIXELS), strip.Color(40, 20, 100));
+      candyCount++;
+    } else if (candyCount < candyLength+spacing) {
+      strip.setPixelColor(getOffSet(i, offset, N_PIXELS), strip.Color(23, 127, 2));
+      candyCount++;
+    } else {
+      candyCount=0;
+    }
+  }
+  delay(50);
+
+  if(offset >= N_PIXELS){
+    offset=0;
+  }else{
+    offset++;
+  } 
+
+  
+
+  handleButtonClick(); 
+  
+  strip.show();
+  
+   
+}
+
+
+
+
+
+
+
+
  
 void loop() {
 
@@ -92,7 +150,28 @@ void loop() {
       }
       currentCase = 1;
       handleButtonClick();
-      theaterChase(strip.Color(127, 127, 127), 50); // White, half brightness
+      //theaterChase(strip.Color(127, 127, 127), 50); // White, half brightness
+
+      //start candycane
+
+
+      candy_cane();
+
+
+
+
+
+
+
+
+      //end candycane
+
+
+
+
+
+
+      
       break;
     case 2 : 
       if(DEBUG){
