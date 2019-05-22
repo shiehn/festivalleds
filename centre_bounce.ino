@@ -38,12 +38,14 @@ void centerBounce(){
           strip.setPixelColor(maxVal-t, tempColor);
         }
         flip = !flip; 
+
+        if (handleButtonClick()) {
+          return;
+        }
       }
            
       strip.setPixelColor(ui-t, color);
       strip.setPixelColor(di+t, color);
-
-      
     }
     
     strip.setPixelColor(ui, color);

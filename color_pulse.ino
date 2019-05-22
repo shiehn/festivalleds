@@ -7,10 +7,13 @@ void colorPulse(){
     prevColor = 1;
   }
    
-  Serial.println(prevColor); 
+ // Serial.println(prevColor); 
 
   int maxBright = 100;
   for (int i = 10; i < maxBright; i++) {
+    if (handleButtonClick()) {
+        return;
+      }
     strip.clear();
     strip.setBrightness(i);
     
@@ -22,6 +25,9 @@ void colorPulse(){
   }
 
   for (int i = 100; i > 10; i--) {
+    if (handleButtonClick()) {
+        return;
+      }
     strip.clear();
     strip.setBrightness(i);
     

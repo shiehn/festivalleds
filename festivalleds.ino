@@ -3,12 +3,12 @@
 
 #define N_PIXELS  180  // Number of pixels in strand
 #define MIC_PIN   A0  // Microphone is attached to this analog pin
-#define LED_PIN    6  // NeoPixel LED strand is connected to this pin
+#define LED_PIN    2  // NeoPixel LED strand is                 connected to this pin
 #define SAMPLE_WINDOW   10  // Sample window for average level
 int PEAK_HANG = 24; //Time of pause before peak dot falls
 int PEAK_FALL = 4; //Rate of falling peak dot
 int INPUT_FLOOR = 10; //Lower range of analogRead input
-int INPUT_CEILING = 1000; //Max range of analogRead input, the lower the value the more sensitive (1023 = max)
+int INPUT_CEILING = 500; //Max range of analogRead input, the lower the value the more sensitive (1023 = max)
 byte peak = 16;      // Peak level of column; used for falling dots
 unsigned int sample;
 byte dotCount = 0;  //Frame counter for peak dot
@@ -31,9 +31,13 @@ vol[SAMPLES],       // Collection of prior volume samples
 
 
 int currentCase = 999;
-int buttonVal = 2;
+int buttonVal = 0;
+
+int DEBUG=0;
     
 Adafruit_NeoPixel strip = Adafruit_NeoPixel(N_PIXELS, LED_PIN, NEO_GRB + NEO_KHZ800);
+
+
 
 void setup() {
   // This is only needed on 5V Arduinos (Uno, Leonardo, etc.).
@@ -41,6 +45,18 @@ void setup() {
   // line.  Audio samples are 'cleaner' at 3.3V.
   // COMMENT OUT THIS LINE FOR 3.3V ARDUINOS (FLORA, ETC.):
   //analogReference(EXTERNAL);
+
+  pinMode(4,INPUT);
+  pinMode(5,INPUT);
+  pinMode(6,INPUT);
+  pinMode(7,INPUT);
+  pinMode(8,INPUT);
+  pinMode(9,INPUT);
+  pinMode(10,INPUT);
+  pinMode(11,INPUT);
+  pinMode(12,INPUT);
+  pinMode(13,INPUT);
+
   memset(vol, 0, sizeof(vol));
   strip.begin();
   strip.setBrightness(100);
@@ -51,60 +67,15 @@ void setup() {
 int randSpeed=0;
 int randPause=0;
 
-
-
-
-
-
-
  
 void loop() {
 
-  handleButtonClick();
-
-
+  handleButtonClick(); 
   switch (buttonVal) {
     case 0 :
-      currentCase = 0;
-      // %%%%%%%%%%%%%%%%%%%%%%%% COLOR PATERNS CODE %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-      Serial.println("COLOR PATTERNS!!!");
- 
-      randSpeed = random(0,5); 
-      randPause = random(0,4000);
- 
-      colorWipe(strip.Color(255, random(0,255), random(0,255)), randSpeed); // Red
-      colorWipe(strip.Color(random(0,255), 255, random(0,255)), randSpeed); // Green
-      colorWipe(strip.Color(random(0,255), random(0,255), 255), randSpeed); // Blue
-      theaterChase(strip.Color(random(0,255), random(0,255), random(0,255)), 50); // White, half brightness
-      
-      quickPaint(strip.Color(0, 0, 0)); // clear
-      delay(randPause);
-      break; 
-    case 1 :
-      currentCase = 1;
-      theaterChase(strip.Color(127, 127, 127), 50); // White, half brightness
-      break;
-    case 2 : 
-      currentCase = 2;
-      centerBounce();
-      //theaterChase(strip.Color(127,   0,   0), 50); // Red, half brightness
-      break;
-    case 3 :
-      currentCase = 3;
-      Serial.println("COLOR PULSE!!!");
-      colorPulse();
-      break;
-    case 4 :
-      currentCase = 4;
-      rainbow(10);
-      break;
-    case 5 :
-      currentCase = 5;
-      theaterChaseRainbow(50);
-      break;
-    case 6 :
-      // %%%%%%%%%%%%%%%%%%%%%%%% VU_METER CENTRE CODE %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-      Serial.println("VU CENTRE CODE!!!");
+      if(DEBUG){
+        Serial.println("PATTERN: 0");
+      }
       if(currentCase != 6){
         PEAK_HANG = 24; //Time of pause before peak dot falls
         PEAK_FALL = 4; //Rate of falling peak dot
@@ -115,9 +86,67 @@ void loop() {
       
       vuCentre(); 
       break;
+    case 1 :
+      if(DEBUG){
+        Serial.println("PATTERN: 1");
+      }
+      currentCase = 1;
+      handleButtonClick();
+      theaterChase(strip.Color(127, 127, 127), 50); // White, half brightness
+      break;
+    case 2 : 
+      if(DEBUG){
+        Serial.println("PATTERN: 2");
+      }
+      currentCase = 2;
+      centerBounce();
+      //theaterChase(strip.Color(127,   0,   0), 50); // Red, half brightness
+      break;
+    case 3 :
+      if(DEBUG){
+        Serial.println("PATTERN: 3");
+      }
+      currentCase = 3; 
+      colorPulse();
+      break;
+    case 4 :
+      if(DEBUG){
+        Serial.println("PATTERN: 4");
+      }
+      currentCase = 4;
+      rainbow(10);
+      break;
+    case 5 :
+      if(DEBUG){
+        Serial.println("PATTERN: 5");
+      }
+      currentCase = 5;
+      theaterChaseRainbow(50);
+      break;
+    case 6 :
+      if(DEBUG){
+        Serial.println("PATTERN: 6");
+      }
+      currentCase = 0;
+      // %%%%%%%%%%%%%%%%%%%%%%%% COLOR PATERNS CODE %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+      
+      handleButtonClick();
+ 
+      randSpeed = random(0,5); 
+      randPause = random(0,4000);
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  
+      colorWipe(strip.Color(255, random(0,255), random(0,255)), randSpeed); // Red
+      colorWipe(strip.Color(random(0,255), 255, random(0,255)), randSpeed); // Green
+      colorWipe(strip.Color(random(0,255), random(0,255), 255), randSpeed); // Blue
+      theaterChase(strip.Color(random(0,255), random(0,255), random(0,255)), 50); // White, half brightness
+      
+      quickPaint(strip.Color(0, 0, 0)); // clear
+      delay(randPause);
+      break; 
     case 7 :
-      // %%%%%%%%%%%%%%%%%%%%%%%% VU_METER BOTTOM_UP CODE %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-      Serial.println("VU BOTTOM_UP CODE!!!");
+      if(DEBUG){
+        Serial.println("PATTERN: 7");
+      }
       if(currentCase != 7){
         PEAK_FALL = 60;
         peak      = 0,      // Used for falling dot
@@ -132,23 +161,67 @@ void loop() {
        
       vuBottomUp();
       break;
-  }
+    case 8 :
+      if(DEBUG){
+        Serial.println("PATTERN: 8");
+      }
+      currentCase = 8;
+      centreSplit();
+      break;
+  } 
 }
 
 int randomColor(){
   return random(0,255);
 }
 
-bool handleButtonClick() {
-  if (digitalRead(12) == HIGH) {
+bool handleButtonClick() {  
+  for (int x = 4; x < 14; x++) {
+    if (digitalRead(x) == 0){
+      int prevVal = buttonVal;
+  
+      buttonVal = x-4;
+      if (prevVal != buttonVal) {
+        Serial.println("BUTTON CLICKED");
+        Serial.println(buttonVal);
+        //delay(500);
+        return true;
+      } 
+    }
+  }
+
+/*
+  if (digitalRead(13) == 0) {
     int prevVal = buttonVal;
 
     buttonVal++;
-    if (buttonVal > 7) { 
+    if (buttonVal > 8) { 
       buttonVal = 0;
     }
 
     if (prevVal != buttonVal) {
+      Serial.println("BUTTON CLICK" + buttonVal);
+      delay(500);
+      return true;
+    }
+
+    return false;
+  } 
+*/
+}
+
+/*
+bool handleButtonClick() { 
+  if (digitalRead(13) == 0) {
+    int prevVal = buttonVal;
+
+    buttonVal++;
+    if (buttonVal > 8) { 
+      buttonVal = 0;
+    }
+
+    if (prevVal != buttonVal) {
+      Serial.println("BUTTON CLICK" + buttonVal);
       delay(500);
       return true;
     }
@@ -156,3 +229,4 @@ bool handleButtonClick() {
     return false;
   } 
 }
+*/

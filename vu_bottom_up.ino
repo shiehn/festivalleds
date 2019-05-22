@@ -1,6 +1,6 @@
 void vuBottomUp(){
   // %%%%%%%%%%%%%%%%%%%%%%%% VU_METER CODE %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-      Serial.println("VU CODE!!!");
+      //Serial.println("VU CODE!!!");
 
       uint8_t  i;
       uint16_t minLvl, maxLvl;
