@@ -1,4 +1,4 @@
-#include <Adafruit_NeoPixel.h>
+#include <Adafruit_NeoPixel.h> 
 #include <math.h>
 
 #define N_PIXELS  180  // Number of pixels in strand
@@ -36,9 +36,7 @@ int buttonVal = 0;
 int DEBUG=0;
     
 Adafruit_NeoPixel strip = Adafruit_NeoPixel(N_PIXELS, LED_PIN, NEO_GRB + NEO_KHZ800);
-
-
-
+ 
 void setup() {
   // This is only needed on 5V Arduinos (Uno, Leonardo, etc.).
   // Connect 3.3V to mic AND TO AREF ON ARDUINO and enable this
@@ -66,65 +64,6 @@ void setup() {
 
 int randSpeed=0;
 int randPause=0;
-
-
-
-
-
-int candyLength = 14;
-int spacing = 3;
-int offset = 0;
-
-int getOffSet(int index, int off_set, int maxlen){
-  int value = index + off_set;
-
-  if(value < maxlen){
-    return value;
-  } else {
-    return value - maxlen;  
-  }
-}
-
-void candy_cane(){
-  int candyCount = 0;
-  for (int i = 0; i < N_PIXELS; i++) {
-
-      //Serial.println(getOffSet(i, offset, N_PIXELS)); 
-    
-    if (candyCount < candyLength) {
-      strip.setPixelColor(getOffSet(i, offset, N_PIXELS), strip.Color(40, 20, 100));
-      candyCount++;
-    } else if (candyCount < candyLength+spacing) {
-      strip.setPixelColor(getOffSet(i, offset, N_PIXELS), strip.Color(23, 127, 2));
-      candyCount++;
-    } else {
-      candyCount=0;
-    }
-  }
-  delay(50);
-
-  if(offset >= N_PIXELS){
-    offset=0;
-  }else{
-    offset++;
-  } 
-
-  
-
-  handleButtonClick(); 
-  
-  strip.show();
-  
-   
-}
-
-
-
-
-
-
-
-
  
 void loop() {
 
@@ -142,36 +81,22 @@ void loop() {
       }
       currentCase = 6;
       
-      vuCentre(); 
+      //vuCentre(); 
+
+
+      disperse();
+
+
+      
       break;
     case 1 :
       if(DEBUG){
         Serial.println("PATTERN: 1");
       }
       currentCase = 1;
-      handleButtonClick();
-      //theaterChase(strip.Color(127, 127, 127), 50); // White, half brightness
-
-      //start candycane
-
-
-      candy_cane();
-
-
-
-
-
-
-
-
-      //end candycane
-
-
-
-
-
-
+      handleButtonClick(); 
       
+      candy_cane(); 
       break;
     case 2 : 
       if(DEBUG){
