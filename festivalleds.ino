@@ -31,9 +31,9 @@ vol[SAMPLES],       // Collection of prior volume samples
 
 
 int currentCase = 999;
-int buttonVal = 6;
+int buttonVal = 0;
 
-int DEBUG=0;
+int DEBUG=1;
     
 Adafruit_NeoPixel strip = Adafruit_NeoPixel(N_PIXELS, LED_PIN, NEO_GRB + NEO_KHZ800);
  
@@ -62,8 +62,9 @@ void setup() {
   Serial.begin(9600); 
 }
 
-//int randSpeed=0;
-//int randPause=0;
+byte colors[3][3] = { {0xff, 0,0}, 
+                        {0xff, 0xff, 0xff}, 
+                        {0   , 0   , 0xff} };
  
 void loop() {
 
@@ -73,15 +74,20 @@ void loop() {
       if(DEBUG){
         Serial.println("PATTERN: 0");
       }
-      if(currentCase != 6){
-        PEAK_HANG = 24; //Time of pause before peak dot falls
-        PEAK_FALL = 4; //Rate of falling peak dot
-        INPUT_FLOOR = 10; //Lower range of analogRead input
-        INPUT_CEILING = 1000; //Max range of analogRead input, the lower the value the more sensitive (1023 = max)
-      }
-      currentCase = 0;
       
-      vuCentre();  
+      if(currentCase != 0){
+        PEAK_FALL = 60;
+        peak      = 0,      // Used for falling dot
+        dotCount  = 0,      // Frame counter for delaying dot-falling speed
+        volCount  = 0;      // Frame counter for storing past volume data
+        vol[SAMPLES],       // Collection of prior volume samples
+        lvl       = 20,      // Current "dampened" audio level
+        minLvlAvg = 0,      // For dynamic adjustment of graph low & high
+        maxLvlAvg = 512;
+      } 
+      currentCase = 0;
+       
+      vuBottomUp();  
       break;
     case 1 :
       if(DEBUG){
@@ -97,15 +103,21 @@ void loop() {
         Serial.println("PATTERN: 2");
       }
       currentCase = 2;
-      centerBounce();
-      //theaterChase(strip.Color(127,   0,   0), 50); // Red, half brightness
+      centerBounce(); 
       break;
     case 3 :
       if(DEBUG){
         Serial.println("PATTERN: 3");
-      }
-      currentCase = 3; 
-      colorPulse();
+      } 
+      if(currentCase != 3){
+        PEAK_HANG = 24; //Time of pause before peak dot falls
+        PEAK_FALL = 4; //Rate of falling peak dot
+        INPUT_FLOOR = 10; //Lower range of analogRead input
+        INPUT_CEILING = 1000; //Max range of analogRead input, the lower the value the more sensitive (1023 = max)
+      } 
+      currentCase = 3;
+      
+      vuCentre(); 
       break;
     case 4 :
       if(DEBUG){
@@ -119,40 +131,24 @@ void loop() {
         Serial.println("PATTERN: 5");
       }
       currentCase = 5;
-      theaterChaseRainbow(50);
+      Fire(55,120,15);
       break;
     case 6 :
       if(DEBUG){
         Serial.println("PATTERN: 6");
       }
-      currentCase = 6;
-      // %%%%%%%%%%%%%%%%%%%%%%%% COLOR PATERNS CODE %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-      
-      handleButtonClick();
-      //disperse();
-      byte colors[3][3] = { {0xff, 0,0}, 
-                        {0xff, 0xff, 0xff}, 
-                        {0   , 0   , 0xff} };
+      currentCase = 6; 
+      handleButtonClick();  
 
-  BouncingColoredBalls(6, colors);
+      BouncingColoredBalls(6, colors);
       break; 
     case 7 :
       if(DEBUG){
         Serial.println("PATTERN: 7");
       }
-      if(currentCase != 7){
-        PEAK_FALL = 60;
-        peak      = 0,      // Used for falling dot
-        dotCount  = 0,      // Frame counter for delaying dot-falling speed
-        volCount  = 0;      // Frame counter for storing past volume data
-        vol[SAMPLES],       // Collection of prior volume samples
-        lvl       = 20,      // Current "dampened" audio level
-        minLvlAvg = 0,      // For dynamic adjustment of graph low & high
-        maxLvlAvg = 512;
-      } 
-      currentCase = 7;
-       
-      vuBottomUp();
+      currentCase = 7; 
+      
+      meteorRain(0xff,0xff,0xff,10, 64, true, 20); 
       break;
     case 8 :
       if(DEBUG){
@@ -160,6 +156,14 @@ void loop() {
       }
       currentCase = 8;
       centreSplit();
+      break;
+    case 9 :
+      if(DEBUG){
+        Serial.println("PATTERN: 9");
+      }
+      currentCase = 9;
+  
+      TwinkleRandom(20, 100, false);
       break;
   } 
 }
@@ -176,8 +180,7 @@ bool handleButtonClick() {
       buttonVal = x-4;
       if (prevVal != buttonVal) {
         Serial.println("BUTTON CLICKED");
-        Serial.println(buttonVal);
-        //delay(500);
+        Serial.println(buttonVal); 
         return true;
       } 
     }

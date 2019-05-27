@@ -1,4 +1,6 @@
- 
+
+
+
 void BouncingColoredBalls(int BallCount, byte colors[][3]) {
   float Gravity = -9.81;
   int StartHeight = 1;
@@ -19,8 +21,8 @@ void BouncingColoredBalls(int BallCount, byte colors[][3]) {
     TimeSinceLastBounce[i] = 0;
     Dampening[i] = 0.90 - float(i)/pow(BallCount,2); 
   }
-
-  while (true) {
+ 
+  while (true && currentCase==buttonVal) {
     for (int i = 0 ; i < BallCount ; i++) {
       handleButtonClick();
       TimeSinceLastBounce[i] =  millis() - ClockTimeSinceLastBounce[i];
