@@ -31,7 +31,7 @@ vol[SAMPLES],       // Collection of prior volume samples
 
 
 int currentCase = 999;
-int buttonVal = 0;
+int buttonVal = 6;
 
 int DEBUG=0;
     
@@ -62,8 +62,8 @@ void setup() {
   Serial.begin(9600); 
 }
 
-int randSpeed=0;
-int randPause=0;
+//int randSpeed=0;
+//int randPause=0;
  
 void loop() {
 
@@ -79,15 +79,9 @@ void loop() {
         INPUT_FLOOR = 10; //Lower range of analogRead input
         INPUT_CEILING = 1000; //Max range of analogRead input, the lower the value the more sensitive (1023 = max)
       }
-      currentCase = 6;
+      currentCase = 0;
       
-      //vuCentre(); 
-
-
-      disperse();
-
-
-      
+      vuCentre();  
       break;
     case 1 :
       if(DEBUG){
@@ -131,21 +125,16 @@ void loop() {
       if(DEBUG){
         Serial.println("PATTERN: 6");
       }
-      currentCase = 0;
+      currentCase = 6;
       // %%%%%%%%%%%%%%%%%%%%%%%% COLOR PATERNS CODE %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
       
       handleButtonClick();
- 
-      randSpeed = random(0,5); 
-      randPause = random(0,4000);
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  
-      colorWipe(strip.Color(255, random(0,255), random(0,255)), randSpeed); // Red
-      colorWipe(strip.Color(random(0,255), 255, random(0,255)), randSpeed); // Green
-      colorWipe(strip.Color(random(0,255), random(0,255), 255), randSpeed); // Blue
-      theaterChase(strip.Color(random(0,255), random(0,255), random(0,255)), 50); // White, half brightness
-      
-      quickPaint(strip.Color(0, 0, 0)); // clear
-      delay(randPause);
+      //disperse();
+      byte colors[3][3] = { {0xff, 0,0}, 
+                        {0xff, 0xff, 0xff}, 
+                        {0   , 0   , 0xff} };
+
+  BouncingColoredBalls(6, colors);
       break; 
     case 7 :
       if(DEBUG){
@@ -212,6 +201,28 @@ bool handleButtonClick() {
     return false;
   } 
 */
+}
+
+
+void showStrip() {
+ #ifdef ADAFRUIT_NEOPIXEL_H 
+   // NeoPixel
+   strip.show();
+ #endif 
+}
+
+void setPixel(int Pixel, byte red, byte green, byte blue) {
+ #ifdef ADAFRUIT_NEOPIXEL_H 
+   // NeoPixel
+   strip.setPixelColor(Pixel, strip.Color(red, green, blue));
+ #endif 
+}
+
+void setAll(byte red, byte green, byte blue) {
+  for(int i = 0; i < N_PIXELS; i++ ) {
+    setPixel(i, red, green, blue); 
+  }
+  showStrip();
 }
 
 /*
